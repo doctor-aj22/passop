@@ -1,33 +1,33 @@
 import { useEffect, useState, useMemo } from "react";
 import PasswordForm from "../components/PasswordForm";
 import PasswordList from "../components/PasswordList";
-import { loadPasswords, addPassword as addLocal, deletePassword as delLocal, updatePassword as updLocal } from "../lib/storage";
+import { listPasswords, createPassword, deletePassword as delApi, updatePassword as updApi } from "../lib/api";
 
 export default function Home() {
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
 
-  useEffect(() => {
-    setItems(loadPasswords());
-  }, []);
+useEffect(() => {
+  listPasswords().then(setItems);
+}, []);
 
-  const addPassword = (data) => {
-    if (editing) {
-      const updated = updLocal(editing.id, data);
-      setItems(prev => prev.map(p => p.id === editing.id ? updated : p));
-      setEditing(null);
-    } else {
-      const created = addLocal(data);
-      setItems(prev => [...prev, created]);
-    }
-  };
+  const addPassword = async (data) => {
+  if (editing) {
+    const updated = await updApi(editing._id, data);
+    setItems(prev => prev.map(p => p._id === editing._id ? updated : p));
+    setEditing(null);
+  } else {
+    const created = await createPassword(data);
+    setItems(prev => [...prev, created]);
+  }
+};
 
-  const deletePassword = (id) => {
-    if (confirm("Do you really want to delete?")) {
-      delLocal(id);
-      setItems(prev => prev.filter(p => p.id !== id));
-    }
-  };
+  const deletePassword = async (id) => {
+  if (confirm("Do you really want to delete?")) {
+    await delApi(id);
+    setItems(prev => prev.filter(p => p._id !== id));
+  }
+};
 
   const copyToClipboard = async (value) => {
     await navigator.clipboard.writeText(value);
