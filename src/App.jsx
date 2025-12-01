@@ -1,11 +1,14 @@
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+// src/App.jsx
+import { useState } from "react";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
-  return (
-    <>
-      <Navbar />
-      <Home />
-    </>
-  );
+  const [user, setUser] = useState(null);
+
+  if (!user) {
+    return <Auth onLogin={(userData) => setUser(userData)} />;
+  }
+
+  return <Dashboard user={user} onLogout={() => setUser(null)} />;
 }
